@@ -20,9 +20,9 @@ func main() {
 		panic("bad command")
 	}
 }
-func run() {
+func run() { //container
 	fmt.Printf("Running %v as %v\n", os.Args[2:], os.Getpid())
-	cmd := exec.Command("/proc/self/exe", append([]string{"child"}, os.Args[2:]...)...)
+	cmd := exec.Command("/proc/self/exe", append([]string{"child"}, os.Args[2:]...)...) //exec.Command("/proc/self/exe", "child", os.Args[2], os.Args[3:]...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -33,9 +33,10 @@ func run() {
 	cmd.Run()
 
 }
-func child() {
+func child() { //container
 	fmt.Printf("Running %v as %v", os.Args[2:], os.Getpid())
-	syscall.Sethostname([]byte("container"))
+	syscall.Sethostname([]byte("container")) //syscall.Mount("proc", "proc", "proc", 0, "")
+	must(syscall.Mount("proc", "proc", "proc", 0, ""))
 	syscall.Chroot("/helmsman/ubuntu-fs")
 	syscall.Chdir("/")
 
